@@ -19,7 +19,10 @@ public class GyroQueue {
 
     // добавление элемента
     public boolean Offer(String name, double x, double y, double z) {
-        return pGyroQueue.offer(name, x, y, z);
+        Date now = calendar.getTime();
+        Timestamp timeStamp = new Timestamp( now.getTime());
+        TData data = new TData( name, timeStamp.toString(), x, y, z);
+        return pGyroQueue.offer(name, x, y, z, data);
 
     }
     // извлечение элемента
@@ -30,18 +33,15 @@ public class GyroQueue {
     // -------- PRIVATE ---------------------
     private Queue<TData> queue;
 
-    static private GyroQueue pGyroQueue = null;
+    static volatile private GyroQueue pGyroQueue = null;
     private GyroQueue() {
         calendar = Calendar.getInstance();
         queue = new LinkedList<TData>();
     }
-    private boolean offer( String name, double x, double y, double z) {
-        Date now = calendar.getTime();
-        Timestamp timeStamp = new Timestamp( now.getTime());
-        TData data = new TData( name, timeStamp.toString(), x, y, z);
+    private synchronized boolean offer( String name, double x, double y, double z, TData data) {
         return queue.offer(data);
     }
-    private TData poll() {
+    private synchronized TData poll() {
         return queue.poll();
     }
     private Calendar calendar;
