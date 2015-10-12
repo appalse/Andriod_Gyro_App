@@ -9,12 +9,13 @@ public class ServerMain implements Runnable {
     private Logger logger;
     private ConnectionListener connectionListener;
     public ServerMain() {
-        logger = Logger.GetLogger();
+
+        logger = new Logger( "log.txt" );
     }
 
     public void run()
     {
-        logger.WriteLine("START SERVER!");
+        logger.LogDebug(this.getClass().getName().toString(), "START SERVER!");
         startServer();
     }
 
@@ -23,16 +24,16 @@ public class ServerMain implements Runnable {
     }
 
     private void startServer() {
-        logger.WriteLine("Start server");
+        logger.LogDebug( this.getClass().getName().toString(), "Start server");
         int port1 = 12346;
         try {
-            connectionListener = new ConnectionListener(port1);
+            connectionListener = new ConnectionListener(port1, logger);
             Thread thrListener = new Thread(connectionListener);
-            thrListener.setName("ConnectionListener thread");
+            logger.LogDebug(this.getClass().getName().toString(), "ConnectionListener thread");
             thrListener.start();
             // данные с гироскопа обновляеются каждую милисекунду и отправляются в Sender, который в другом потоке
         } catch( Exception e ) {
-            logger.WriteLine(e.getMessage());
+            logger.LogError(this.getClass().getName().toString(), e.getMessage() );
         }
     }
 }

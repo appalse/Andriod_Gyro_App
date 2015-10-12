@@ -1,42 +1,41 @@
 package com.startandroid.gyroscope;
 
 import java.io.FileWriter;
+import java.io.PrintWriter;
 
-/**
- * Created by Acer-PC on 07.10.2015.
- */
-public class Logger  {
-    // Синглтон
-    static public Logger GetLogger() {
-        if( pLogger == null ) {
-            pLogger = new Logger();
-        }
-        return pLogger;
+public class Logger implements ILogger {
+    public Logger( String _filePath) {
+        filePath = _filePath;
     }
 
-    public void WriteLine( String text ) {
-        pLogger.writeLine( text );
+    public void WriteLineInConsole( String text ) {
+        System.out.println(text);
     }
 
-    // -------- PRIVATE ---------------------
-    private Logger() {
-        //pLogger.filePath = "D:\\log.txt";
-       /* try {
-            pLogger.writer = new FileWriter(filePath, true);
-        } catch( Exception e ) {
-           // FIXME надо как-то отловить
-        }*/
+    public void LogDebug( String className, String message ) {
+        writeLineInConsole( "[DEBUG] in class " + className + " : " + message );
     }
-    static private Logger pLogger = null;
-    private void writeLine( String text ) {
-        System.out.println( text );
-   /*     try {
-            pLogger.writer.write(text);
-        } catch( Exception e ) {
-            // FIXME надо как-то отловить
-        }*/
+    public void LogError( String className, String message ) {
+        writeLineInConsole( "[ERROR] in class " + className + " : " + message );
+    }
 
-    }
-    private FileWriter writer;
     private String filePath;
+
+    private  void writeLineInConsole( String text ) {
+        System.out.println( text );
+    }
+
+    private void writeLineInFile( String text ) {
+        PrintWriter writer = null;
+        try{
+            writer = new PrintWriter(filePath);
+            writer.println( text );
+        } catch( Exception e ) {
+            System.out.println( e.getMessage() );
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
 }

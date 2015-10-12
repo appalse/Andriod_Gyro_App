@@ -8,33 +8,33 @@ import java.net.Socket;
  * Created by Acer-PC on 07.10.2015.
  */
 public class Sender  implements Runnable  {
-    public static Logger logger;
+    private Logger logger;
     private Socket socket;
     private volatile boolean isRunning = true;
-    public Sender(Socket _socket) {
+    public Sender(Socket _socket, Logger _logger) {
         socket = _socket;
-        logger = Logger.GetLogger();
+        logger = _logger;
     }
 
     public void run()
     {
-        logger.WriteLine("Привет из потока Sender!");
+        logger.LogDebug(this.getClass().getName().toString(), "Привет из потока Sender!");
         send();
     }
 
     public void start()   {
-        logger.WriteLine("start Sender!");
+        logger.LogDebug(this.getClass().getName().toString(), "start Sender!");
     }
 
     public void StopSending() {
-        logger.WriteLine("stop Sender!");
+        logger.LogDebug(this.getClass().getName().toString(), "stop Sender!");
         isRunning = false;
     }
 
     private void send() {
         try {
             GyroQueue gyroQueue = GyroQueue.GetGyroQueue();
-            logger.WriteLine("Server is started");
+            logger.LogDebug(this.getClass().getName().toString(), "Server is started");
             int i = 0;
             TData data;
             String text;
@@ -44,14 +44,14 @@ public class Sender  implements Runnable  {
                 if( data != null ) {
                     text = data.getName() + " " + data.getTime() + " : " + data.getX() + ", " + data.getY() + ", " + data.getZ() + ".";
                     os.write(text.getBytes());
-                    logger.WriteLine("Poll " + data.getX() + ", " + data.getY() + ", " + data.getZ());
-                    logger.WriteLine("Text was sent!");
+                    logger.LogDebug(this.getClass().getName().toString(), "Poll " + data.getX() + ", " + data.getY() + ", " + data.getZ());
+                    logger.LogDebug(this.getClass().getName().toString(), "Text was sent!");
                 }
             }
         } catch(IOException e) {
-            logger.WriteLine( "Sender IOException" + e.getMessage() );
+            logger.LogError(this.getClass().getName().toString(), "Sender IOException" + e.getMessage());
         } catch(Exception e) {
-            logger.WriteLine( e.getMessage() );
+            logger.LogError(this.getClass().getName().toString(),  e.getMessage() );
         }
     }
 }
