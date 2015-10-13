@@ -8,13 +8,11 @@ import java.lang.Thread;
  * Created by Acer-PC on 07.10.2015.
  */
 public class ConnectionListener implements Runnable  {
-    private Logger logger;
-    private int port;
-    Sender sender1;
 
-    public ConnectionListener(int _port, Logger _logger ) {
+    public ConnectionListener(int _port, Logger _logger, QueuesContainer _gyroDataQueuesContainer ) {
         port = _port;
         logger = _logger;
+        gyroDataQueuesContainer = _gyroDataQueuesContainer;
     }
 
     public void run() {
@@ -24,8 +22,9 @@ public class ConnectionListener implements Runnable  {
             while(true) {
                 Socket fromClient = serverSocket.accept();	// в отдельный поток - уже в отдельном потоке
                 logger.LogDebug(this.getClass().getName().toString(), "New connection was detected");
-                sender1 = new Sender(fromClient, logger);
-                Thread thr1 = new Thread(sender1);
+                int indexOfAddedQueue = 0;//gyroDataQueuesContainer.AddQueue( new GyroQueue() ); // to add new queue of gyroscope data for this connection
+                sender = new Sender(fromClient, logger, gyroDataQueuesContainer, indexOfAddedQueue );
+                Thread thr1 = new Thread(sender);
                 thr1.setName("Sender thread");
                 thr1.start();
             }
@@ -37,8 +36,14 @@ public class ConnectionListener implements Runnable  {
     }
 
     public void StopAllConnections() {
-        sender1.StopSending();
+        if( sender != null ) {
+            sender.StopSending();
+        }
     }
 
-
+    // -------- PRIVATE ---------------------
+    private Logger logger;
+    private int port;
+    private Sender sender;
+    private QueuesContainer gyroDataQueuesContainer;
 }

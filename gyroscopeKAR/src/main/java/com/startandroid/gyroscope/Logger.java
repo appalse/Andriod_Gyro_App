@@ -8,34 +8,26 @@ public class Logger implements ILogger {
         filePath = _filePath;
     }
 
-    public void WriteLineInConsole( String text ) {
+/*    public void WriteLineInConsole( String text ) {
         System.out.println(text);
     }
-
+*/
     public void LogDebug( String className, String message ) {
-        writeLineInConsole( "[DEBUG] in class " + className + " : " + message );
+        String text = "[DEBUG] in class " + className + " : " + message;
+        writeLineInConsole( text );
     }
     public void LogError( String className, String message ) {
-        writeLineInConsole( "[ERROR] in class " + className + " : " + message );
+        String text = "[ERROR] in class " + className + " : " + message;
+        writeLineInConsole( text );
     }
 
     private String filePath;
 
-    private  void writeLineInConsole( String text ) {
+    private synchronized void writeLineInConsole( String text ) {
         System.out.println( text );
     }
 
-    private void writeLineInFile( String text ) {
-        PrintWriter writer = null;
-        try{
-            writer = new PrintWriter(filePath);
-            writer.println( text );
-        } catch( Exception e ) {
-            System.out.println( e.getMessage() );
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-        }
+    private synchronized void writeLineInFile( String text ) {
+
     }
 }

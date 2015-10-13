@@ -1,4 +1,6 @@
 package com.startandroid.gyroscope;
+import android.view.ViewDebug;
+
 import java.util.Random;
 import java.lang.Thread;
 
@@ -6,11 +8,10 @@ import java.lang.Thread;
  * Created by Acer-PC on 07.10.2015.
  */
 public class ServerMain implements Runnable {
-    private Logger logger;
-    private ConnectionListener connectionListener;
-    public ServerMain() {
 
-        logger = new Logger( "log.txt" );
+    public ServerMain( QueuesContainer _gyroDataQueuesContainer ) {
+        gyroDataQueuesContainer = _gyroDataQueuesContainer;
+        logger = new Logger( "D:\\ServerMainLog.txt" );
     }
 
     public void run()
@@ -23,11 +24,17 @@ public class ServerMain implements Runnable {
         connectionListener.StopAllConnections();
     }
 
+    // -------- PRIVATE ---------------------
+    private Logger logger;
+    private ConnectionListener connectionListener;
+    private QueuesContainer gyroDataQueuesContainer;
+
     private void startServer() {
-        logger.LogDebug( this.getClass().getName().toString(), "Start server");
-        int port1 = 12346;
+        int port = 12346;
+        logger.LogDebug(this.getClass().getName().toString(), "Start server. Port " + Integer.toString( port ) );
+
         try {
-            connectionListener = new ConnectionListener(port1, logger);
+            connectionListener = new ConnectionListener(port, logger, gyroDataQueuesContainer);
             Thread thrListener = new Thread(connectionListener);
             logger.LogDebug(this.getClass().getName().toString(), "ConnectionListener thread");
             thrListener.start();

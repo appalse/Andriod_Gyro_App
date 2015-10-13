@@ -12,6 +12,10 @@ import android.hardware.SensorManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import android.view.View.OnClickListener;
 
@@ -37,6 +41,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     TextView gyroXValueText;
     TextView gyroYValueText;
     TextView gyroZValueText;
+    private Calendar calendar = null;
+    QueuesContainer gyroDataQueuesContainer = null;
 
 
     /** Called when the activity is first created. */
@@ -99,23 +105,24 @@ public class MainActivity extends Activity implements SensorEventListener {
         gyroYValueText = (TextView) findViewById(R.id.valueGyroY);
         gyroZValueText = (TextView) findViewById(R.id.valueGyroZ);
         simpleText = (TextView) findViewById(R.id.textView);
+
+        gyroDataQueuesContainer = new QueuesContainer();
+        calendar = Calendar.getInstance();
     }
 
 
     public void StartServerAndSendData()
     {
         if( !isServerStarted ) {
-            simpleText.setText("Started!");
+            simpleText.setText("Started New!");
             isServerStarted = true;
-            serverMain = new ServerMain();
+            serverMain = new ServerMain(gyroDataQueuesContainer);
             Thread listenThread = new Thread(serverMain);
             listenThread.setName("ServerMain thread");
             listenThread.start();
 
             // Отправка по сети не должна быть в main thread/UI
             // http://stackoverflow.com/questions/23840331/how-to-resolve-android-os-networkonmainthreadexception
-            //Sender sender = new Sender(mXValueText.getText().toString(), mYValueText.getText().toString(), mZValueText.getText().toString());
-            //sender.execute("");
         } else {
             simpleText.setText("Already started!");
         }
@@ -163,8 +170,11 @@ public class MainActivity extends Activity implements SensorEventListener {
                 mZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
                 //Logger.GetLogger().WriteLine("put element in queue " + event.values[SensorManager.DATA_X] + ", " + event.values[SensorManager.DATA_Y] + ", " + event.values[SensorManager.DATA_Z]);
 
-                if( !GyroQueue.GetGyroQueue().Offer("ACCELEROMETER", event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]) ) {
-                    //Logger.GetLogger().WriteLine("error in Offer");
+                if( gyroDataQueuesContainer != null && calendar != null ) {
+                    Date now = calendar.getTime();
+                    Timestamp timeStamp = new Timestamp( now.getTime());
+                    TData data = new TData("ACCELEROMETER", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                    gyroDataQueuesContainer.AddDataToQueues(data);
                 }
             }
             break;
@@ -174,9 +184,11 @@ public class MainActivity extends Activity implements SensorEventListener {
                 gyroYValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Y]));
                 gyroZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
                 //Logger.GetLogger().WriteLine("put element in queue " + event.values[SensorManager.DATA_X] + ", " + event.values[SensorManager.DATA_Y] + ", " + event.values[SensorManager.DATA_Z]);
-
-                if( !GyroQueue.GetGyroQueue().Offer("GYROSCOPE", event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]) ) {
-                    //Logger.GetLogger().WriteLine("error in Offer");
+                if( gyroDataQueuesContainer != null && calendar != null ) {
+                    Date now = calendar.getTime();
+                    Timestamp timeStamp = new Timestamp(now.getTime());
+                    TData data = new TData("GYROSCOPE", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                    gyroDataQueuesContainer.AddDataToQueues(data);
                 }
             }
             break;
