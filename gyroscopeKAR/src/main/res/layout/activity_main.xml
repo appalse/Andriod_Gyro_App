@@ -135,28 +135,37 @@
         android:layout_height="wrap_content"
         android:text="Start Server"
         android:id="@+id/buttonStart"
-        android:layout_below="@+id/value_gyro_x"
+        android:layout_marginRight="33dp"
+        android:layout_marginEnd="33dp"
+        android:layout_alignTop="@+id/value_gyro_z"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="38dp"
-        android:layout_marginEnd="38dp" />
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stop Server"
         android:id="@+id/buttonStop"
-        android:layout_below="@+id/value_acc_x"
+        android:layout_alignBottom="@+id/value_acc_z"
         android:layout_alignLeft="@+id/buttonStart"
         android:layout_alignStart="@+id/buttonStart" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Data"
-        android:id="@+id/buttonAddData"
-        android:layout_below="@+id/buttonStop"
-        android:layout_toRightOf="@+id/accelerometer"
-        android:layout_toEndOf="@+id/accelerometer"
-        android:layout_marginTop="80dp" />
+        android:text="Server Status : "
+        android:id="@+id/serverStatus"
+        android:layout_above="@+id/value_gyro_x"
+        android:layout_alignLeft="@+id/buttonStart"
+        android:layout_alignStart="@+id/buttonStart" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Not Runned"
+        android:id="@+id/ServerStatus_value"
+        android:layout_alignTop="@+id/value_gyro_x"
+        android:layout_alignRight="@+id/buttonStop"
+        android:layout_alignEnd="@+id/buttonStop" />
+
 </RelativeLayout>

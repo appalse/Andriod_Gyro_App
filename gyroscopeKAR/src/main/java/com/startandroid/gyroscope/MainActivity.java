@@ -35,10 +35,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     TextView accXValueText;
     TextView accYValueText;
     TextView accZValueText;
+    TextView srvStatus;
 
     Button btnStart;
     Button btnStop;
-    Button btnSend;
 
     private Calendar calendar = null;
     private static Logger logger;
@@ -80,18 +80,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         };
         btnStop.setOnClickListener(oclBtnStop);
 
-
-        btnSend = (Button) findViewById(R.id.buttonAddData);
-        OnClickListener oclbtnSend = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AddData();
-
-            }
-        };
-        btnSend.setOnClickListener(oclbtnSend);
-
-
         // присвоили менеджеру работу с серсором
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         // создали список сенсоров для записи и сортировки
@@ -124,6 +112,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         accXValueText = (TextView) findViewById(R.id.value_acc_x);
         accYValueText = (TextView) findViewById(R.id.value_acc_y);
         accZValueText = (TextView) findViewById(R.id.value_acc_z);
+        srvStatus = (TextView) findViewById(R.id.ServerStatus_value);
     }
 
 
@@ -136,6 +125,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 newThread.setName("ConnectionListenerThrd");
                 newThread.start();
                 isSrvRunning = true;
+                srvStatus.setText("Started");
             }
         } catch ( Exception e ) {
             logger.WriteLine(e.getMessage(), getClass().getName(), "StartSrv" );
@@ -149,6 +139,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             if( isSrvRunning && connectionListener != null ) {
                 connectionListener.StopListenning();;
                 isSrvRunning = false;
+                srvStatus.setText("Stopped");
             }
         } catch ( Exception e ) {
             logger.WriteLine(e.getMessage(), getClass().getName(), "StopSrv" );
@@ -171,13 +162,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, mMagneticFieldSensor, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
-    }
-
-    public void AddData() {
-        Date now = calendar.getTime();
-        Timestamp timeStamp = new Timestamp( now.getTime());
-        TData data = new TData("ACCELEROMETER", timeStamp.toString(), 10, 20, 30);
-        queuesHolder.PushDataToQueues(data);
     }
 
     @Override
