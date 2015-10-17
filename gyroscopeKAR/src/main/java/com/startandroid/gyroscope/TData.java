@@ -1,8 +1,8 @@
 package com.startandroid.gyroscope;
 
-/**
- * Created by Acer-PC on 07.10.2015.
- */
+// Class is intended only for extracting data. The data cannot be overwritten
+// Therefore there is no need to use synchronization
+
 public class TData {
     public TData() {
         x = y = z = 0;

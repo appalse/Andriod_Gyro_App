@@ -29,20 +29,23 @@ public class MainActivity extends Activity implements SensorEventListener {
     Sensor mMagneticFieldSensor;
     Sensor mGyroscopeSensor;
     /** Наши текствью в которые будем все выводить */
-    TextView mForceValueText;
-    TextView mXValueText;
-    TextView mYValueText;
-    TextView mZValueText;
-    TextView simpleText;
-    Button btnStart;
-    Button btnStop;
-    boolean isServerStarted;
-    ServerMain serverMain;
     TextView gyroXValueText;
     TextView gyroYValueText;
     TextView gyroZValueText;
+    TextView accXValueText;
+    TextView accYValueText;
+    TextView accZValueText;
+
+    Button btnStart;
+    Button btnStop;
+    Button btnSend;
+
     private Calendar calendar = null;
-    QueuesContainer gyroDataQueuesContainer = null;
+    private static Logger logger;
+    private static boolean isSrvRunning;
+    private static int portN; // can get it from GUI-form
+    private static ConnectionListener connectionListener = null;
+    private static QueuesHolder queuesHolder = null;
 
 
     /** Called when the activity is first created. */
@@ -51,26 +54,43 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isServerStarted = false;
+        // preparation for server running
+        isSrvRunning = false;
+        logger = new Logger();
+        portN = 12346;
+        queuesHolder = new QueuesHolder(logger);
+        connectionListener = new ConnectionListener(logger, portN, queuesHolder);
+        calendar = Calendar.getInstance();
 
-       btnStart = (Button) findViewById(R.id.button);
+       btnStart = (Button) findViewById(R.id.buttonStart);
         OnClickListener oclBtnStart = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StartServerAndSendData();
-
+                StartServer();
             }
         };
         btnStart.setOnClickListener(oclBtnStart);
-       btnStop = (Button) findViewById(R.id.button2);
+
+       btnStop = (Button) findViewById(R.id.buttonStop);
         OnClickListener oclBtnStop = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 StopServer();
-
             }
         };
         btnStop.setOnClickListener(oclBtnStop);
+
+
+        btnSend = (Button) findViewById(R.id.buttonAddData);
+        OnClickListener oclbtnSend = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddData();
+
+            }
+        };
+        btnSend.setOnClickListener(oclbtnSend);
+
 
         // присвоили менеджеру работу с серсором
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -98,43 +118,40 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         }
         // привязываем наши объекты к нашей разметке
-        mXValueText = (TextView) findViewById(R.id.value_x);
-        mYValueText = (TextView) findViewById(R.id.value_y);
-        mZValueText = (TextView) findViewById(R.id.value_z);
-        gyroXValueText = (TextView) findViewById(R.id.valueGyroX);
-        gyroYValueText = (TextView) findViewById(R.id.valueGyroY);
-        gyroZValueText = (TextView) findViewById(R.id.valueGyroZ);
-        simpleText = (TextView) findViewById(R.id.textView);
-
-        gyroDataQueuesContainer = new QueuesContainer();
-        calendar = Calendar.getInstance();
+        gyroXValueText = (TextView) findViewById(R.id.value_gyro_x);
+        gyroYValueText = (TextView) findViewById(R.id.value_gyro_y);
+        gyroZValueText = (TextView) findViewById(R.id.value_gyro_z);
+        accXValueText = (TextView) findViewById(R.id.value_acc_x);
+        accYValueText = (TextView) findViewById(R.id.value_acc_y);
+        accZValueText = (TextView) findViewById(R.id.value_acc_z);
     }
 
 
-    public void StartServerAndSendData()
+    // Start listening for connections from client
+    public void StartServer()
     {
-        if( !isServerStarted ) {
-            simpleText.setText("Started New!");
-            isServerStarted = true;
-            serverMain = new ServerMain(gyroDataQueuesContainer);
-            Thread listenThread = new Thread(serverMain);
-            listenThread.setName("ServerMain thread");
-            listenThread.start();
-
-            // Отправка по сети не должна быть в main thread/UI
-            // http://stackoverflow.com/questions/23840331/how-to-resolve-android-os-networkonmainthreadexception
-        } else {
-            simpleText.setText("Already started!");
+        try{
+            if( !isSrvRunning && connectionListener != null && queuesHolder != null ) {
+                Thread newThread = new Thread(connectionListener);
+                newThread.setName("ConnectionListenerThrd");
+                newThread.start();
+                isSrvRunning = true;
+            }
+        } catch ( Exception e ) {
+            logger.WriteLine(e.getMessage(), getClass().getName(), "StartSrv" );
         }
     }
 
+    // Stop all current connections between Server and Client
+    // Stop listening for any connection
     public void StopServer() {
-        if( isServerStarted ) {
-            simpleText.setText("Stopped!");
-            isServerStarted = false;
-            serverMain.Close();
-        } else {
-            simpleText.setText("Already stopped!");
+        try{
+            if( isSrvRunning && connectionListener != null ) {
+                connectionListener.StopListenning();;
+                isSrvRunning = false;
+            }
+        } catch ( Exception e ) {
+            logger.WriteLine(e.getMessage(), getClass().getName(), "StopSrv" );
         }
     }
 
@@ -156,6 +173,12 @@ public class MainActivity extends Activity implements SensorEventListener {
         mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
+    public void AddData() {
+        Date now = calendar.getTime();
+        Timestamp timeStamp = new Timestamp( now.getTime());
+        TData data = new TData("ACCELEROMETER", timeStamp.toString(), 10, 20, 30);
+        queuesHolder.PushDataToQueues(data);
+    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -165,16 +188,19 @@ public class MainActivity extends Activity implements SensorEventListener {
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER: {
                 //собственно выводим все полученые параметры в текствьюшки наши
-                mXValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_X]));
-                mYValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Y]));
-                mZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
-                //Logger.GetLogger().WriteLine("put element in queue " + event.values[SensorManager.DATA_X] + ", " + event.values[SensorManager.DATA_Y] + ", " + event.values[SensorManager.DATA_Z]);
+                accXValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_X]));
+                accYValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Y]));
+                accZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
 
-                if( gyroDataQueuesContainer != null && calendar != null ) {
-                    Date now = calendar.getTime();
-                    Timestamp timeStamp = new Timestamp( now.getTime());
-                    TData data = new TData("ACCELEROMETER", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
-                    gyroDataQueuesContainer.AddDataToQueues(data);
+                try {
+                    if( queuesHolder != null && calendar != null ) {
+                        Date now = calendar.getTime();
+                        Timestamp timeStamp = new Timestamp( now.getTime());
+                        TData data = new TData("ACCELEROMETER", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                        queuesHolder.PushDataToQueues(data);
+                    }
+                } catch ( Exception e ) {
+                    logger.WriteLine(e.getMessage(), getClass().getName(), "PushData");
                 }
             }
             break;
@@ -183,12 +209,15 @@ public class MainActivity extends Activity implements SensorEventListener {
                 gyroXValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_X]));
                 gyroYValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Y]));
                 gyroZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
-                //Logger.GetLogger().WriteLine("put element in queue " + event.values[SensorManager.DATA_X] + ", " + event.values[SensorManager.DATA_Y] + ", " + event.values[SensorManager.DATA_Z]);
-                if( gyroDataQueuesContainer != null && calendar != null ) {
-                    Date now = calendar.getTime();
-                    Timestamp timeStamp = new Timestamp(now.getTime());
-                    TData data = new TData("GYROSCOPE", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
-                    gyroDataQueuesContainer.AddDataToQueues(data);
+                try {
+                    if( queuesHolder != null && calendar != null ) {
+                        Date now = calendar.getTime();
+                        Timestamp timeStamp = new Timestamp(now.getTime());
+                        TData data = new TData("GYROSCOPE", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                        queuesHolder.PushDataToQueues(data);
+                    }
+                } catch ( Exception e ) {
+                    logger.WriteLine(e.getMessage(), getClass().getName(), "PushData" );
                 }
             }
             break;

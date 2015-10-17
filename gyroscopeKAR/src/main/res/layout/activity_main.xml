@@ -1,307 +1,162 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TableLayout     android:id="@+id/TableLayout01"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <TableRow    android:layout_width="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/row_force"
-        android:layout_margin="5dip">
-        <TextView    android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/label_force"
-            android:text="Force:"
-            android:gravity="right"></TextView>
-        <TextView    android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/value_force"
-            android:text="-"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3"></TextView>
-    </TableRow>
-    <TableRow    android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:id="@+id/row_x"
-        android:layout_margin="5dip">
-        <TextView    android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="X:"
-            android:id="@+id/label_x"
-            android:gravity="right"></TextView>
-        <TextView    android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/value_x"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3"></TextView>
-    </TableRow>
-    <TableRow    android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:id="@+id/row_y"
-        android:layout_margin="5dip">
-        <TextView    android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Y:"
-            android:id="@+id/label_y"
-            android:gravity="right"></TextView>
-        <TextView    android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/value_y"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3"></TextView>
-    </TableRow>
-    <TableRow    android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:id="@+id/row_z"
-        android:layout_margin="5dip">
-        <TextView    android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Z:"
-            android:id="@+id/label_z"
-            android:gravity="right"></TextView>
-        <TextView    android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/value_z"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3"></TextView>
-    </TableRow>
+        android:text="Gyroscope:"
+        android:id="@+id/gyroscope"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X: "
+        android:id="@+id/label_gyro_x"
+        android:layout_below="@+id/gyroscope" />
 
-    </TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" -"
+        android:id="@+id/value_gyro_x"
+        android:layout_below="@+id/gyroscope"
+        android:layout_toRightOf="@+id/label_gyro_x"
+        android:layout_toEndOf="@+id/label_gyro_x" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Y: "
+        android:id="@+id/label_gyro_y"
+        android:layout_below="@+id/label_gyro_x"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView2"
-            android:text="Gyroscope:"
-            android:gravity="right"
-            android:layout_column="0" />
-    </TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" -"
+        android:id="@+id/value_gyro_y"
+        android:layout_below="@+id/label_gyro_x"
+        android:layout_toRightOf="@+id/label_gyro_y"
+        android:layout_toEndOf="@+id/label_gyro_y" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Z: "
+        android:id="@+id/label_gyro_z"
+        android:layout_below="@+id/label_gyro_y"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="X:"
-            android:id="@+id/labelGyroX"
-            android:gravity="right"
-            android:layout_column="0" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" -"
+        android:id="@+id/value_gyro_z"
+        android:layout_below="@+id/label_gyro_y"
+        android:layout_toRightOf="@+id/label_gyro_z"
+        android:layout_toEndOf="@+id/label_gyro_z" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/valueGyroX"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3" />
-    </TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accelerometer:"
+        android:id="@+id/accelerometer"
+        android:layout_below="@+id/label_gyro_z"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="31dp" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X: "
+        android:id="@+id/label_acc_x"
+        android:layout_below="@+id/accelerometer"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Y:"
-            android:id="@+id/labelGyroY"
-            android:gravity="right"
-            android:layout_column="0" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" -"
+        android:id="@+id/value_acc_x"
+        android:layout_below="@+id/accelerometer"
+        android:layout_toRightOf="@+id/label_gyro_x"
+        android:layout_toEndOf="@+id/label_gyro_x" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/valueGyroY"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3" />
-    </TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Y: "
+        android:id="@+id/label_acc_y"
+        android:layout_below="@+id/label_acc_x"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" -"
+        android:id="@+id/value_acc_y"
+        android:layout_below="@+id/label_acc_x"
+        android:layout_toRightOf="@+id/label_acc_x"
+        android:layout_toEndOf="@+id/label_acc_x" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Z:"
-            android:id="@+id/labelGyroZ"
-            android:gravity="right"
-            android:layout_column="0" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Z :"
+        android:id="@+id/label_acc_z"
+        android:layout_below="@+id/label_acc_y"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:id="@+id/valueGyroZ"
-            android:layout_marginLeft="5dip"
-            android:layout_column="3" />
-    </TableRow>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" -"
+        android:id="@+id/value_acc_z"
+        android:layout_below="@+id/label_acc_y"
+        android:layout_toRightOf="@+id/label_acc_y"
+        android:layout_toEndOf="@+id/label_acc_y" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Server"
+        android:id="@+id/buttonStart"
+        android:layout_below="@+id/value_gyro_x"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="38dp"
+        android:layout_marginEnd="38dp" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start srv"
-            android:id="@+id/button"
-            android:layout_column="0" />
-    </TableRow>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop Server"
+        android:id="@+id/buttonStop"
+        android:layout_below="@+id/value_acc_x"
+        android:layout_alignLeft="@+id/buttonStart"
+        android:layout_alignStart="@+id/buttonStart" />
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="STOP SRV "
-            android:id="@+id/button2"
-            android:layout_column="0" />
-    </TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
-
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="try"
-            android:id="@+id/textView"
-            android:layout_column="0" />
-    </TableRow>
-</TableLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Data"
+        android:id="@+id/buttonAddData"
+        android:layout_below="@+id/buttonStop"
+        android:layout_toRightOf="@+id/accelerometer"
+        android:layout_toEndOf="@+id/accelerometer"
+        android:layout_marginTop="80dp" />
+</RelativeLayout>

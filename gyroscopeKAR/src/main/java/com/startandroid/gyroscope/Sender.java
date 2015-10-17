@@ -2,65 +2,74 @@ package com.startandroid.gyroscope;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+// This class is sending the data from specified GyroDataQueue to the connected client
+// via specified socket.
+// If we need to stop sending data the StopSending() method should be called.
+// This class is run in separate thread.
+// The variable 'boolean shouldSending' can be changed from other thread therefore it is synchronized
 
-/**
- * Created by Acer-PC on 07.10.2015.
- */
 public class Sender  implements Runnable  {
 
 
-    public Sender(Socket _socket, Logger _logger, QueuesContainer _gyroDataQueuesContainer, int _indexOfAddedQueue ) {
+    public Sender(Socket _socket, Logger _logger, GyroDataQueue _dataQueue ) {
         socket = _socket;
         logger = _logger;
-        gyroDataQueuesContainer = _gyroDataQueuesContainer;
-        indexOfAddedQueue = _indexOfAddedQueue;
+        dataQueue = _dataQueue;
+        shouldSending = new AtomicBoolean(false);
     }
 
+    // Run thread.
     public void run()
     {
-        logger.LogDebug(this.getClass().getName().toString(), "Привет из потока Sender!");
-        send();
+        logger.WriteLine("Hello from Sender thread!");
+        shouldSending.set(true);
+        startSending();
     }
 
-    public void start()   {
-        logger.LogDebug(this.getClass().getName().toString(), "start Sender!");
-    }
-
+    // Stop sending data to the client
     public void StopSending() {
-        logger.LogDebug(this.getClass().getName().toString(), "stop Sender!");
-        isRunning = false;
+        shouldSending.set(false);
     }
 
     // -------- PRIVATE ---------------------
-
     private Logger logger;
     private Socket socket;
-    private volatile boolean isRunning = true;
-    private QueuesContainer gyroDataQueuesContainer;
-    private int indexOfAddedQueue;
+    private AtomicBoolean shouldSending;
+    private GyroDataQueue dataQueue;
 
-    private void send() {
+    // Start sending gyroscope and accelerometer data from specified data queue to the client
+    private void startSending() {
         try {
-            GyroQueue gyroQueue = gyroDataQueuesContainer.GetQueue(indexOfAddedQueue);
-            logger.LogDebug(this.getClass().getName().toString(), "Server is started");
-            int i = 0;
+            logger.WriteLine("Sending is started!");
             TData data;
             String text;
-            while(isRunning) {
-                OutputStream os = socket.getOutputStream();
-                data = gyroQueue.Poll();
+            OutputStream os = socket.getOutputStream();
+            while(shouldSending.get() ) {
+                data = dataQueue.Poll();
                 if( data != null ) {
-                    text = data.getSensorName() + " " + data.getTime() + " : " + data.getX() + ", " + data.getY() + ", " + data.getZ() + ".";
+                    text = data.getX() + ", " + data.getY() + ", " + data.getZ();
                     os.write(text.getBytes());
-                    logger.LogDebug(this.getClass().getName().toString(), "Poll " + data.getX() + ", " + data.getY() + ", " + data.getZ());
-                    logger.LogDebug(this.getClass().getName().toString(), "Text was sent!");
+                    logger.WriteLine("Text was sent! dataQueue.Poll() : " + text);
                 }
             }
         } catch(IOException e) {
-            logger.LogError(this.getClass().getName().toString(), "Sender IOException" + e.getMessage());
+            if( e.getMessage().contains("Connection reset by peer: socket write error")) {
+                logger.WriteLine( Thread.currentThread().getName() + " was closed by client", getCurrentThreadName(), getClassName(), "waitForNewConnection"  );
+            } else {
+                logger.WriteLine( "Sender IOException " + e.getMessage(), getCurrentThreadName(), getClassName(), "startSending" );
+            }
         } catch(Exception e) {
-            logger.LogError(this.getClass().getName().toString(),  e.getMessage() );
+            logger.WriteLine( e.getMessage(), getCurrentThreadName(), getClassName(), "startSending" );
         }
+    }
+
+    private String getCurrentThreadName() {
+        return Thread.currentThread().getName();
+    }
+
+    private String getClassName() {
+        return this.getClass().getName();
     }
 }
