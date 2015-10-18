@@ -139,6 +139,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             if( isSrvRunning && connectionListener != null ) {
                 connectionListener.StopListenning();;
                 isSrvRunning = false;
+                queuesHolder.DeleteAllQueues();
                 srvStatus.setText("Stopped");
             }
         } catch ( Exception e ) {

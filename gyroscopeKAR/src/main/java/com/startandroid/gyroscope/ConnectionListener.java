@@ -81,13 +81,7 @@ public class ConnectionListener implements Runnable  {
                 // Method serverSocket.accept() is blocking,
                 // so we are waiting on this method till the client is connected
                 Socket fromClient = serverSocket.accept();
-                // Create the queue with data (from gyroscope and accelerometer sensors)
-                // The client will receive the data from this queue
-                GyroDataQueue newDataQueue = queuesHolder.AddNewQueue();
-                if(newDataQueue == null) {
-                    throw new Exception("GyroDataQueue newDataQueue = queuesHolder.AddNewQueue() returns null!");
-                }
-                Sender sender = new Sender(fromClient, logger, newDataQueue);
+                Sender sender = new Sender(fromClient, logger, queuesHolder);
                 senders.add(sender);
                 logger.WriteLine("New Connection #" + senders.size() + " was detected");
                 Thread newThread = new Thread(sender);

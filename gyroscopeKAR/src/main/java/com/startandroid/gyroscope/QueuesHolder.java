@@ -37,7 +37,37 @@ public class QueuesHolder {
         }
     }
 
+    // Delete all queues from queue list, when server is stopped
+    public synchronized void DeleteAllQueues() {
+        if(queuesList != null) {
+            try {
+                logger.WriteLine("Queue list is deleted " );
+                queuesList.clear();
+            } catch( Exception e ) {
+                logger.WriteLine(e.getMessage(), getClassName(), "DeleteAllQueues" );
+            }
+        }
+    }
+
+    // Remove 1 queue from queue list, when client is disconnected
+    public synchronized void RemoveQueue( GyroDataQueue dataQueue ) {
+        if(queuesList != null && dataQueue != null ) {
+            try {
+                int indexOfQueue = queuesList.indexOf(dataQueue);
+                if( indexOfQueue < 0 ) {
+                    throw new Exception("Specified queue wasn't found");
+                }
+                queuesList.remove(indexOfQueue);
+            } catch( Exception e ) {
+                logger.WriteLine(e.getMessage(), getClassName(), "RemoveQueue" );
+            }
+        }
+    }
     // -------- PRIVATE ---------------------
     private List<GyroDataQueue> queuesList = null;
     private Logger logger;
+
+    private String getClassName() {
+        return this.getClass().getName();
+    }
 }
