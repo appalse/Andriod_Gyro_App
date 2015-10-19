@@ -18,9 +18,10 @@ public class Sender  implements Runnable  {
         logger = _logger;
         queuesHolder = _queuesHolder;
         shouldSending = new AtomicBoolean(false);
+        mutex = new Object();
         // Create the queue with data (from gyroscope and accelerometer sensors)
         // The client will receive the data from this queue
-        dataQueue = queuesHolder.AddNewQueue();
+        dataQueue = queuesHolder.AddNewQueue(mutex);
     }
 
     // Run thread.
@@ -46,6 +47,7 @@ public class Sender  implements Runnable  {
     private AtomicBoolean shouldSending;
     private GyroDataQueue dataQueue;
     private QueuesHolder queuesHolder;
+    private Object mutex;
 
     // Start sending gyroscope and accelerometer data from specified data queue to the client
     private void startSending() {
@@ -55,6 +57,13 @@ public class Sender  implements Runnable  {
             String text;
             OutputStream os = socket.getOutputStream();
             while(shouldSending.get() ) {
+                synchronized( mutex ) {
+                    while(!dataQueue.HasData()) {
+                        try{
+                            mutex.wait();
+                        } catch (InterruptedException e) {}
+                    }
+                }
                 data = dataQueue.Poll();
                 if( data != null ) {
                     text = data.getX() + ", " + data.getY() + ", " + data.getZ();

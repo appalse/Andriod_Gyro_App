@@ -11,9 +11,9 @@ public class QueuesHolder {
         queuesList = new ArrayList<GyroDataQueue>();
     }
 
-    public synchronized GyroDataQueue AddNewQueue() {
+    public synchronized GyroDataQueue AddNewQueue( Object mutex) {
         int indexOfAddedQueue = -1;
-        GyroDataQueue newQueue = new GyroDataQueue();
+        GyroDataQueue newQueue = new GyroDataQueue(mutex);
         if( queuesList != null && newQueue != null ) {
             queuesList.add(newQueue);
             indexOfAddedQueue = queuesList.size() - 1;
@@ -21,7 +21,7 @@ public class QueuesHolder {
         if( indexOfAddedQueue < 0 ) {
             return null;
         } else {
-            return queuesList.get(indexOfAddedQueue);
+            return newQueue;
         }
     }
 

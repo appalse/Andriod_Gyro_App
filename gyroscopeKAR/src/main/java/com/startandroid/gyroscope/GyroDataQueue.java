@@ -11,22 +11,33 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class GyroDataQueue {
     // Create queue with data
-    public GyroDataQueue() {
+    public GyroDataQueue(Object _mutex) {
         queueWithData = new LinkedBlockingQueue<TData>();
+        mutex = _mutex;
     }
 
-
     // Add new element to queue
-    public synchronized boolean Offer( TData data ) {
-        return queueWithData.offer(data);
-
+    public boolean Offer( TData data ) {
+        boolean result = false;
+        synchronized( this ) {
+            result = queueWithData.offer(data);
+        }
+        synchronized( mutex ) {
+            mutex.notify();
+        }
+        return result;
     }
     // Extract element from queue. If cannot extract data, the null is returned
     public synchronized TData Poll() {
         return queueWithData.poll();
     }
 
+    public synchronized boolean HasData() {
+        return queueWithData.size() > 0;
+    }
+
     // -------- PRIVATE ---------------------
     private BlockingQueue<TData> queueWithData;
+    private Object mutex;
 
 }
