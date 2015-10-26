@@ -168,4 +168,13 @@
         android:layout_alignRight="@+id/buttonStop"
         android:layout_alignEnd="@+id/buttonStop" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/CommentTextView"
+        android:layout_below="@+id/value_acc_z"
+        android:layout_alignRight="@+id/serverStatus"
+        android:layout_alignEnd="@+id/serverStatus"
+        android:layout_marginTop="32dp" />
+
 </RelativeLayout>

@@ -36,6 +36,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     TextView accYValueText;
     TextView accZValueText;
     TextView srvStatus;
+    public TextView commentTextView;
 
     Button btnStart;
     Button btnStop;
@@ -113,6 +114,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         accYValueText = (TextView) findViewById(R.id.value_acc_y);
         accZValueText = (TextView) findViewById(R.id.value_acc_z);
         srvStatus = (TextView) findViewById(R.id.ServerStatus_value);
+        commentTextView = (TextView) findViewById(R.id.CommentTextView);
     }
 
 
