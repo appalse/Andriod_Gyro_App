@@ -1,7 +1,9 @@
 package com.startandroid.gyroscope;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // This class is sending the data from specified GyroDataQueue to the connected client
@@ -54,7 +56,6 @@ public class Sender  implements Runnable  {
         try {
             logger.WriteLine("Sending is started!");
             TData data;
-            String text;
             OutputStream os = socket.getOutputStream();
             while(shouldSending.get() ) {
                 synchronized( mutex ) {
@@ -66,9 +67,9 @@ public class Sender  implements Runnable  {
                 }
                 data = dataQueue.Poll();
                 if( data != null ) {
-                    text = data.getX() + ", " + data.getY() + ", " + data.getZ();
-                    os.write(text.getBytes());
-                    logger.WriteLine("Text was sent! dataQueue.Poll() : " + text);
+                    byte[] buffer = makeBuffer(data);
+                    os.write(buffer);
+                    logger.WriteLine("Text was sent! dataQueue.Poll() : " + buffer.toString());
                 }
             }
         } catch(IOException e) {
@@ -81,6 +82,57 @@ public class Sender  implements Runnable  {
         } catch(Exception e) {
             logger.WriteLine( e.getMessage(), getCurrentThreadName(), getClassName(), "startSending" );
         }
+    }
+
+    private byte[] makeBuffer( TData data )
+    {
+        int bufLength = 36; // bytes count for package with data
+        byte[] buffer = new byte[bufLength]; // allocate the memory for 36 bytes
+        buffer[0] = (byte) bufLength; // write the buffer size into first position of the buffer
+        putShortValuesInBuffer(data.getSensorId(), 2, buffer, 1, 2); // 2 bytes to be out in buffer from 1 to 2 positions. This is package/data id : 0x1A9 - for gyroscope, 0x1AA - for accelerometer
+        putLongValuesInBuffer(data.getTime(), 8, buffer, 3, 10); // 8 bytes. time in nanoseconds
+        putDoubleValuesInBuffer(data.getX(), 8, buffer, 11, 18);
+        putDoubleValuesInBuffer(data.getY(), 8, buffer, 19, 26);
+        putDoubleValuesInBuffer(data.getZ(), 8, buffer, 27, 34);
+        byte controlSum = getCheckSum(buffer, bufLength - 1); // checksum : XOR of al bytes of the package with data
+        buffer[35] = controlSum;
+        return buffer;
+    }
+
+    private void putShortValuesInBuffer(  short data, int size, byte[] buffer, int startPositionInBuffer, int endPositionInBuffer )
+    {
+        byte[] tempBuffer = ByteBuffer.allocate(size).putShort(data).array(); // 2 байта. id пакета: 0x1A9 - гироскоп, 0x1AA - акселерометр
+        // уложить в buffer в позиции от start до end включительно
+        for( int i = startPositionInBuffer; i <= endPositionInBuffer; ++i ) {
+            buffer[i] = tempBuffer[i-startPositionInBuffer];
+        }
+    }
+
+    private void putLongValuesInBuffer(  long data, int size, byte[] buffer, int startPositionInBuffer, int endPositionInBuffer )
+    {
+        byte[] tempBuffer = ByteBuffer.allocate(size).putLong(data).array(); // 8 байт
+        // уложить в buffer в позиции от start до end включительно
+        for( int i = startPositionInBuffer; i <= endPositionInBuffer; ++i ) {
+            buffer[i] = tempBuffer[i-startPositionInBuffer];
+        }
+    }
+
+    private void putDoubleValuesInBuffer( double data, int size, byte[] buffer, int startPositionInBuffer, int endPositionInBuffer )
+    {
+        byte[] tempBuffer = ByteBuffer.allocate(size).putDouble(data).array(); // 8 байт
+        // уложить в buffer в позиции от start до end включительно
+        for( int i = startPositionInBuffer; i <= endPositionInBuffer; ++i ) {
+            buffer[i] = tempBuffer[i-startPositionInBuffer];
+        }
+    }
+
+    private byte getCheckSum( byte[] buffer, int length )
+    {
+        byte xor = buffer[0];
+        for( int i = 1; i < length; ++i ) {
+            xor ^= buffer[i];
+        }
+        return xor;
     }
 
     private String getCurrentThreadName() {

@@ -13,9 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import android.view.View.OnClickListener;
 
@@ -162,9 +160,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         super.onResume();
         //регистрируем сенсоры в объекты сенсора
-        mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
-        mSensorManager.registerListener(this, mMagneticFieldSensor, SensorManager.SENSOR_DELAY_GAME);
-        mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, mMagneticFieldSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -181,9 +179,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 try {
                     if( queuesHolder != null && calendar != null ) {
-                        Date now = calendar.getTime();
-                        Timestamp timeStamp = new Timestamp( now.getTime());
-                        TData data = new TData("ACCELEROMETER", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                        short id = 0x1AA; // "ACCELEROMETER"
+                        TData data = new TData( id, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
                         queuesHolder.PushDataToQueues(data);
                     }
                 } catch ( Exception e ) {
@@ -198,9 +195,8 @@ public class MainActivity extends Activity implements SensorEventListener {
                 gyroZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
                 try {
                     if( queuesHolder != null && calendar != null ) {
-                        Date now = calendar.getTime();
-                        Timestamp timeStamp = new Timestamp(now.getTime());
-                        TData data = new TData("GYROSCOPE", timeStamp.toString(), event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                         short id = 0x1A9; // "GYROSCOPE"
+                        TData data = new TData( id, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
                         queuesHolder.PushDataToQueues(data);
                     }
                 } catch ( Exception e ) {

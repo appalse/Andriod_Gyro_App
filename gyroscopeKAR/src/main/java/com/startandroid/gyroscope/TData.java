@@ -6,26 +6,27 @@ package com.startandroid.gyroscope;
 public class TData {
     public TData() {
         x = y = z = 0;
-        sensorName = "";
+        sensorId = 0;
+        time = 0;
     }
 
-    public TData( String _sensorName, String _time, double _x, double _y, double _z ) {
+    public TData( short _sensorId, long _time, double _x, double _y, double _z ) {
         x = _x;
         y = _y;
         z = _z;
-        sensorName = _sensorName;
+        sensorId = _sensorId;
         time = _time;
     }
     public double getX() { return x; }
     public double getY() { return y; }
     public double getZ() { return z; }
-    public String getSensorName() { return sensorName; }
-    public String getTime() { return time; }
+    public short getSensorId() { return sensorId; }
+    public long getTime() { return time; }
 
     // -------- PRIVATE ---------------------
-    private String sensorName;
+    private short sensorId; // gyroscope = x1A9, accelerometer = 0x1AA
     private double x;
     private double y;
     private double z;
-    private String time;
+    private long time;
 }
