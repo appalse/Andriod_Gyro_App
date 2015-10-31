@@ -177,4 +177,22 @@
         android:layout_alignEnd="@+id/serverStatus"
         android:layout_marginTop="32dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IP address and port"
+        android:id="@+id/ipLable"
+        android:layout_alignTop="@+id/CommentTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ipValue"
+        android:text=" - "
+        android:layout_below="@+id/ipLable"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

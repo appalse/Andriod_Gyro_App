@@ -1,7 +1,10 @@
 package com.startandroid.gyroscope;
 
 import android.app.Activity;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Context;
@@ -13,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteOrder;
 import java.util.Calendar;
 import java.util.List;
 import android.view.View.OnClickListener;
@@ -34,7 +41,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     TextView accYValueText;
     TextView accZValueText;
     TextView srvStatus;
-    public TextView commentTextView;
+    TextView commentTextView;
+    TextView ipAddressTextView;
 
     Button btnStart;
     Button btnStop;
@@ -45,7 +53,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     private static int portN; // can get it from GUI-form
     private static ConnectionListener connectionListener = null;
     private static QueuesHolder queuesHolder = null;
-
 
     /** Called when the activity is first created. */
     @Override
@@ -113,8 +120,32 @@ public class MainActivity extends Activity implements SensorEventListener {
         accZValueText = (TextView) findViewById(R.id.value_acc_z);
         srvStatus = (TextView) findViewById(R.id.ServerStatus_value);
         commentTextView = (TextView) findViewById(R.id.CommentTextView);
+        ipAddressTextView = (TextView) findViewById(R.id.ipValue);
+
+        String ipAddress = wifiIpAddress((WifiManager) getSystemService(Context.WIFI_SERVICE));
+        if(ipAddress != null) {
+            ipAddressTextView.setText(ipAddress + "; port " + portN);
+        } else {
+            ipAddressTextView.setText("Unknown ip");
+        }
     }
 
+    private String wifiIpAddress(WifiManager wifiManager) {
+        int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+        // Convert little-endian to big-endianif needed
+        if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
+            ipAddress = Integer.reverseBytes(ipAddress);
+        }
+        byte[] ipByteArray = BigInteger.valueOf(ipAddress).toByteArray();
+        String ipAddressString;
+        try {
+            ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
+        } catch (UnknownHostException e) {
+            logger.WriteLine(e.getMessage(), getClass().getName(), "wifiIpAddress" );
+            ipAddressString = null;
+        }
+        return ipAddressString;
+    }
 
     // Start listening for connections from client
     public void StartServer()
