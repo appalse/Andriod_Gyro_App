@@ -207,10 +207,8 @@ public class MainActivity extends Activity implements SensorEventListener {
                 accZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
 
                 try {
-                    //if( queuesHolder != null ) {
                         TData data = new TData( ACCELEROMETER_ID, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
                         queuesHolder.PushDataToQueues(data);
-                    //}
                 } catch ( Exception e ) {
                     logger.WriteLine(e.getMessage(), getClass().getName(), "PushData");
                 }
@@ -222,10 +220,8 @@ public class MainActivity extends Activity implements SensorEventListener {
                 gyroYValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Y]));
                 gyroZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
                 try {
-                    //if( queuesHolder != null ) {
                         TData data = new TData( GYROSCOPE_ID, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
                         queuesHolder.PushDataToQueues(data);
-                    //}
                 } catch ( Exception e ) {
                     logger.WriteLine(e.getMessage(), getClass().getName(), "PushData" );
                 }

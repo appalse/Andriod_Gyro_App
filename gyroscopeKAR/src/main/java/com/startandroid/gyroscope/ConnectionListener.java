@@ -81,12 +81,8 @@ public class ConnectionListener implements Runnable  {
                 // Method serverSocket.accept() is blocking,
                 // so we are waiting on this method till the client is connected
                 Socket fromClient = serverSocket.accept();
-                Sender sender = new Sender(fromClient, logger, queuesHolder);
-                senders.add(sender);
+                senders.add(new Sender(fromClient, logger, queuesHolder));
                 logger.WriteLine("New Connection #" + senders.size() + " was detected");
-                Thread newThread = new Thread(sender);
-                newThread.setName("Connection #" + senders.size());
-                newThread.start();
                 // If connection with client was established we continue to wait for the next connection to the same port
             }
         } catch(IOException e) {
