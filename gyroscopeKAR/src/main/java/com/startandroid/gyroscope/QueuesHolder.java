@@ -26,27 +26,19 @@ public class QueuesHolder {
     }
 
     public synchronized void PushDataToQueues(TData data) {
-        if(queuesList != null) {
-            try {
-                for( int i = 0; i < queuesList.size(); ++i ) {
-                    queuesList.get(i).Offer(data);
-                }
-            } catch( Exception e ) {
-                logger.WriteLine(e.getMessage(), this.getClass().getName(), "PushDataToQueues" );
-            }
+        try {
+           for( int i = 0; i < queuesList.size(); ++i ) {
+                 queuesList.get(i).Offer(data);
+           }
+        } catch( Exception e ) {
+            logger.WriteLine(e.getMessage(), this.getClass().getName(), "PushDataToQueues");
         }
     }
 
     // Delete all queues from queue list, when server is stopped
     public synchronized void DeleteAllQueues() {
-        if(queuesList != null) {
-            try {
-                logger.WriteLine("Queue list is deleted " );
-                queuesList.clear();
-            } catch( Exception e ) {
-                logger.WriteLine(e.getMessage(), getClassName(), "DeleteAllQueues" );
-            }
-        }
+         logger.WriteLine("Queue list is deleted " );
+         queuesList.clear();
     }
 
     // Remove 1 queue from queue list, when client is disconnected

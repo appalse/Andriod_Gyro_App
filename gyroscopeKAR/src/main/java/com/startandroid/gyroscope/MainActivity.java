@@ -20,7 +20,6 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
-import java.util.Calendar;
 import java.util.List;
 import android.view.View.OnClickListener;
 
@@ -47,12 +46,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     Button btnStart;
     Button btnStop;
 
-    private Calendar calendar = null;
-    private static Logger logger;
-    private static boolean isSrvRunning;
-    private static int portN; // can get it from GUI-form
-    private static ConnectionListener connectionListener = null;
-    private static QueuesHolder queuesHolder = null;
+    private final short GYROSCOPE_ID= 0x1A9; // "GYROSCOPE"
+    private final short ACCELEROMETER_ID = 0x1AA; // "ACCELEROMETER"
+    private Logger logger;
+    private int portN; // can get it from GUI-form
+    private ConnectionListener connectionListener = null;
+    private QueuesHolder queuesHolder = null;
+    private Thread connectionListenerThread = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -61,12 +61,10 @@ public class MainActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_main);
 
         // preparation for server running
-        isSrvRunning = false;
         logger = new Logger();
         portN = 12346;
         queuesHolder = new QueuesHolder(logger);
         connectionListener = new ConnectionListener(logger, portN, queuesHolder);
-        calendar = Calendar.getInstance();
 
        btnStart = (Button) findViewById(R.id.buttonStart);
         OnClickListener oclBtnStart = new View.OnClickListener() {
@@ -151,11 +149,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void StartServer()
     {
         try{
-            if( !isSrvRunning && connectionListener != null && queuesHolder != null ) {
-                Thread newThread = new Thread(connectionListener);
-                newThread.setName("ConnectionListenerThrd");
-                newThread.start();
-                isSrvRunning = true;
+            if( connectionListenerThread == null && connectionListener != null && queuesHolder != null ) {
+                connectionListenerThread = new Thread(connectionListener);
+                connectionListenerThread.setName("ConnectionListenerThrd");
+                connectionListenerThread.start();
                 srvStatus.setText("Started");
             }
         } catch ( Exception e ) {
@@ -167,9 +164,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     // Stop listening for any connection
     public void StopServer() {
         try{
-            if( isSrvRunning && connectionListener != null ) {
-                connectionListener.StopListenning();;
-                isSrvRunning = false;
+            if( connectionListenerThread != null && connectionListener != null ) {
+                connectionListener.StopListenning();
+                connectionListenerThread.join();
+                connectionListenerThread = null;
                 queuesHolder.DeleteAllQueues();
                 srvStatus.setText("Stopped");
             }
@@ -209,11 +207,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                 accZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
 
                 try {
-                    if( queuesHolder != null && calendar != null ) {
-                        short id = 0x1AA; // "ACCELEROMETER"
-                        TData data = new TData( id, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                    //if( queuesHolder != null ) {
+                        TData data = new TData( ACCELEROMETER_ID, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
                         queuesHolder.PushDataToQueues(data);
-                    }
+                    //}
                 } catch ( Exception e ) {
                     logger.WriteLine(e.getMessage(), getClass().getName(), "PushData");
                 }
@@ -225,11 +222,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                 gyroYValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Y]));
                 gyroZValueText.setText(String.format("%1.3f", event.values[SensorManager.DATA_Z]));
                 try {
-                    if( queuesHolder != null && calendar != null ) {
-                         short id = 0x1A9; // "GYROSCOPE"
-                        TData data = new TData( id, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
+                    //if( queuesHolder != null ) {
+                        TData data = new TData( GYROSCOPE_ID, event.timestamp, event.values[SensorManager.DATA_X], event.values[SensorManager.DATA_Y], event.values[SensorManager.DATA_Z]);
                         queuesHolder.PushDataToQueues(data);
-                    }
+                    //}
                 } catch ( Exception e ) {
                     logger.WriteLine(e.getMessage(), getClass().getName(), "PushData" );
                 }
